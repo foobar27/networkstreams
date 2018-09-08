@@ -245,18 +245,22 @@ public:
 
 //------------------------------------------------------------------------------
 
-int main(int argc, char* argv[])
-{
-    using namespace std;
-    po::options_description desc("Allowed options");
+struct ServerArguments {
+    boost::asio::ip::address address;
     unsigned short port;
-    std::string address_string;
     int threads;
+};
+
+ServerArguments parseCommandLine(int argc, char** argv) {
+    using namespace std;
+    ServerArguments serverArguments;
+    po::options_description desc("Allowed options");
+    std::string address_string;
     desc.add_options()
         ("help", "produce help message")
         ("address,a", po::value(&address_string)->default_value("0.0.0.0"))
-        ("port,p", po::value(&port)->default_value(443), "the port where the server is listening")
-        ("threads", po::value(&threads)->default_value(1))
+        ("port,p", po::value(&serverArguments.port)->default_value(443), "the port where the server is listening")
+        ("threads", po::value(&serverArguments.threads)->default_value(1))
     ;
 
     po::variables_map vm;
@@ -265,26 +269,31 @@ int main(int argc, char* argv[])
 
     if (vm.count("help")) {
         std::cout << desc << "\n";
-        return 1;
+        exit(1);
     }
 
-    if (threads < 1) {
+    if (serverArguments.threads < 1) {
         std::cerr << "threads must be at least 1." << std::endl;
-        return 1;
+        exit(1);
     }
 
-    auto const address = boost::asio::ip::make_address(address_string);
+    serverArguments.address = boost::asio::ip::make_address(address_string);
+    return serverArguments;
+}
 
-    boost::asio::io_context ioc{threads};
+int main(int argc, char** argv)
+{
+    const auto serverArguments = parseCommandLine(argc, argv);
+    boost::asio::io_context ioc {serverArguments.threads};
     ssl::context ctx{ssl::context::sslv23};
     load_server_certificate(ctx);
 
-    std::make_shared<listener>(ioc, ctx, tcp::endpoint{address, port})->run();
+    std::make_shared<listener>(ioc, ctx, tcp::endpoint{serverArguments.address, serverArguments.port})->run();
 
     // Run the I/O service on the requested number of threads
     std::vector<std::thread> v;
-    v.reserve(threads - 1);
-    for(auto i = threads - 1; i > 0; --i)
+    v.reserve(serverArguments.threads - 1);
+    for(auto i = serverArguments.threads - 1; i > 0; --i)
         v.emplace_back(
         [&ioc]
         {
