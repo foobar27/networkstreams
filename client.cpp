@@ -12,34 +12,43 @@
 #include <string>
 #include <vector>
 
-using tcp = boost::asio::ip::tcp;               // from <boost/asio/ip/tcp.hpp>
+using tcp = boost::asio::ip::tcp;
 namespace po = boost::program_options;
-namespace ssl = boost::asio::ssl;               // from <boost/asio/ssl.hpp>
-namespace websocket = boost::beast::websocket;  // from <boost/beast/websocket.hpp>
+namespace ssl = boost::asio::ssl;
+namespace websocket = boost::beast::websocket;
+
+struct ClientArguments {
+    std::string host;
+    std::string port;
+    std::string path {"/"};
+};
+
+ClientArguments parseCommandLine(int argc, char** argv) {
+    using namespace std;
+    po::options_description desc("Allowed options");
+    ClientArguments clientArguments;
+    desc.add_options()
+        ("help", "produce help message")
+        ("host,h", po::value(&clientArguments.host)->required(), "the IP or DNS name of the server to connect")
+        ("port,p", po::value(&clientArguments.port)->default_value("443"), "the port on the server to connect to")
+    ;
+
+    po::variables_map vm;
+    po::store(po::parse_command_line(argc, argv, desc), vm);
+    po::notify(vm);
+
+    if (vm.count("help")) {
+        std::cout << desc << "\n";
+        exit(1);
+    }
+    return clientArguments;
+}
 
 int main(int argc, char** argv)
 {
     try
     {
-        using namespace std;
-        po::options_description desc("Allowed options");
-        std::string host;
-        std::string port;
-        desc.add_options()
-            ("help", "produce help message")
-            ("host,h", po::value(&host)->required(), "the IP or DNS name of the server to connect")
-            ("port,p", po::value(&port)->default_value("443"), "the port on the server to connect to")
-        ;
-
-        po::variables_map vm;
-        po::store(po::parse_command_line(argc, argv, desc), vm);
-        po::notify(vm);
-
-        if (vm.count("help")) {
-            std::cout << desc << "\n";
-            return 1;
-        }
-
+        const auto clientArguments = parseCommandLine(argc, argv);
         auto const text = "hello world";
 
         boost::asio::io_context ioc;
@@ -50,11 +59,11 @@ int main(int argc, char** argv)
         tcp::resolver resolver{ioc};
         websocket::stream<ssl::stream<tcp::socket>> ws{ioc, ctx};
 
-        auto const results = resolver.resolve(host, port);
+        auto const results = resolver.resolve(clientArguments.host, clientArguments.port);
         // TODO error handling
         boost::asio::connect(ws.next_layer().next_layer(), results.begin(), results.end());
         ws.next_layer().handshake(ssl::stream_base::client);
-        ws.handshake(host, "/");
+        ws.handshake(clientArguments.host, clientArguments.path);
 
         // Send the message
         ws.write(boost::asio::buffer(std::string(text)));
