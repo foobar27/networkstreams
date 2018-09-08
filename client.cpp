@@ -1,4 +1,4 @@
-#include "root_certificates.h"
+#include "RootCertificates.h"
 
 #include <boost/beast/core.hpp>
 #include <boost/beast/websocket.hpp>
@@ -67,7 +67,7 @@ ClientArguments parseCommandLine(int argc, char** argv) {
     desc.add_options()
         ("help", "produce help message")
         ("endpoint", po::value(&endpoint)->required(), "the endpoint, e.g. localhost:443/path (default port: 443, default path: /)")
-        ("quiet", "Disable logging")
+        ("quiet,q", "Disable logging")
     ;
 
     po::variables_map vm;

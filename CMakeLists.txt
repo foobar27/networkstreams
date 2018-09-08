@@ -17,6 +17,6 @@ target_compile_features(server PUBLIC cxx_std_11)
 target_link_libraries(server PUBLIC Boost::program_options Boost::system Boost::thread ssl crypto)
 
 
-add_executable(client client.cpp root_certificates.h)
+add_executable(client client.cpp RootCertificates.cpp RootCertificates.h)
 target_compile_features(client PUBLIC cxx_std_11)
 target_link_libraries(client PUBLIC Boost::program_options Boost::system Boost::thread ssl crypto)
