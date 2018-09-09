@@ -266,13 +266,3 @@ void run(const Arguments & args) {
 }
 }
 
-int main(int argc, char** argv) {
-    try {
-        using namespace server;
-        run(parseCommandLine(argc, argv));
-    } catch(std::exception const& e) {
-        std::cerr << "Error: " << e.what() << std::endl;
-        return EXIT_FAILURE;
-    }
-    return EXIT_SUCCESS;
-}

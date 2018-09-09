@@ -6,6 +6,6 @@ find_package(Boost 1.67 REQUIRED COMPONENTS filesystem thread program_options)
 
 find_package(OpenSSL REQUIRED)
 
-add_executable(server Server.cpp Arguments.cpp Arguments.h ServerCertificate.h)
+add_executable(server Main.cpp Server.cpp Server.h Arguments.cpp Arguments.h ServerCertificate.h)
 target_compile_features(server PUBLIC cxx_std_11)
 target_link_libraries(server PUBLIC Boost::program_options Boost::system Boost::thread OpenSSL::SSL OpenSSL::Crypto)
