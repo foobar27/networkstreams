@@ -62,8 +62,7 @@ int main(int argc, char** argv) {
         const auto args = parseCommandLine(argc, argv);
         auto const text = "hello world";
         run(args, text);
-    }
-    catch(std::exception const& e) {
+    } catch(std::exception const& e) {
         std::cerr << "Error: " << e.what() << std::endl;
         return EXIT_FAILURE;
     }
