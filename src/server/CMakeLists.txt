@@ -4,6 +4,8 @@ set(Boost_USE_STATIC_RUNTIME OFF)
 
 find_package(Boost 1.67 REQUIRED COMPONENTS filesystem thread program_options)
 
+find_package(OpenSSL REQUIRED)
+
 add_executable(server Server.cpp ServerCertificate.h)
 target_compile_features(server PUBLIC cxx_std_11)
-target_link_libraries(server PUBLIC Boost::program_options Boost::system Boost::thread ssl crypto)
+target_link_libraries(server PUBLIC Boost::program_options Boost::system Boost::thread OpenSSL::SSL OpenSSL::Crypto)
