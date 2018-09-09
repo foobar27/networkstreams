@@ -245,25 +245,29 @@ public:
 
 //------------------------------------------------------------------------------
 
-int main(int argc, char** argv)
-{
-    const auto serverArguments = server::parseCommandLine(argc, argv);
-    boost::asio::io_context ioc {serverArguments.threads};
+namespace server {
+void run(const Arguments & args) {
+    boost::asio::io_context ioc {args.threads};
     ssl::context ctx{ssl::context::sslv23};
     load_server_certificate(ctx);
 
-    std::make_shared<listener>(ioc, ctx, tcp::endpoint{serverArguments.address, serverArguments.port})->run();
+    std::make_shared<listener>(ioc, ctx, tcp::endpoint{args.address, args.port})->run();
 
     // Run the I/O service on the requested number of threads
     std::vector<std::thread> v;
-    v.reserve(serverArguments.threads - 1);
-    for(auto i = serverArguments.threads - 1; i > 0; --i)
+    v.reserve(args.threads - 1);
+    for(auto i = args.threads - 1; i > 0; --i)
         v.emplace_back(
         [&ioc]
         {
             ioc.run();
         });
     ioc.run();
+}
+}
 
+int main(int argc, char** argv) {
+    using namespace server;
+    run(parseCommandLine(argc, argv));
     return EXIT_SUCCESS;
 }
