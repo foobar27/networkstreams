@@ -6,87 +6,22 @@
 #include <boost/asio/connect.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/ssl/stream.hpp>
-#include <boost/program_options.hpp>
 #include <cstdlib>
 #include <iostream>
-#include <string>
-#include <vector>
+
+#include "Arguments.h"
 
 using tcp = boost::asio::ip::tcp;
-namespace po = boost::program_options;
 namespace ssl = boost::asio::ssl;
 namespace websocket = boost::beast::websocket;
 
-struct Endpoint {
-    std::string host;
-    std::string port;
-    std::string path;
 
-    Endpoint(const std::string & s)
-        : port("443")
-        , path("/"){
-        using namespace std;
-        auto colon = s.find(":");
-        if (colon != string::npos) {
-            this->host = s.substr(0, colon);
-            auto slash = s.find("/");
-            this->port = s.substr(colon + 1, slash - colon - 1);
-            if (slash != string::npos) {
-                this->path = s.substr(slash);
-            }
-        } else {
-            // no port given
-            auto slash = s.find("/");
-            this->host = s.substr(0, slash);
-            if (slash != std::string::npos) {
-                this->path = s.substr(slash);
-            }
-        }
-    }
-};
-
-std::ostream & operator<<(std::ostream & os, Endpoint const & v) {
-    os << v.host << ":" << v.port << v.path;
-    return os;
-}
-
-struct ClientArguments {
-    Endpoint endpoint;
-    bool quiet;
-
-    ClientArguments(const Endpoint & endpoint, bool quiet)
-        : endpoint(endpoint)
-        , quiet(quiet)
-    {}
-};
-
-ClientArguments parseCommandLine(int argc, char** argv) {
-    using namespace std;
-    po::options_description desc("Allowed options");
-    string endpoint;
-    desc.add_options()
-        ("help", "produce help message")
-        ("endpoint", po::value(&endpoint)->required(), "the endpoint, e.g. localhost:443/path (default port: 443, default path: /)")
-        ("quiet,q", "Disable logging")
-    ;
-
-    po::variables_map vm;
-    po::store(po::parse_command_line(argc, argv, desc), vm);
-    po::notify(vm);
-
-    if (vm.count("help")) {
-        std::cout << desc << "\n";
-        exit(1);
-    }
-    bool quiet = vm.count("quiet") > 0;
-    return {{endpoint}, quiet};
-}
 
 int main(int argc, char** argv)
 {
     try
     {
-        const auto clientArguments = parseCommandLine(argc, argv);
+        const auto clientArguments = client::parseCommandLine(argc, argv);
         auto const text = "hello world";
 
         if (!clientArguments.quiet) {

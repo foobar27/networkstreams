@@ -7,7 +7,6 @@
 #include <boost/asio/strand.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/ssl/stream.hpp>
-#include <boost/program_options.hpp>
 #include <algorithm>
 #include <cstdlib>
 #include <functional>
@@ -17,8 +16,9 @@
 #include <thread>
 #include <vector>
 
+#include "Arguments.h"
+
 using tcp = boost::asio::ip::tcp;
-namespace po = boost::program_options;
 namespace ssl = boost::asio::ssl;
 namespace websocket = boost::beast::websocket;
 
@@ -245,45 +245,9 @@ public:
 
 //------------------------------------------------------------------------------
 
-struct ServerArguments {
-    boost::asio::ip::address address;
-    unsigned short port;
-    int threads;
-};
-
-ServerArguments parseCommandLine(int argc, char** argv) {
-    using namespace std;
-    ServerArguments serverArguments;
-    po::options_description desc("Allowed options");
-    std::string address_string;
-    desc.add_options()
-        ("help", "produce help message")
-        ("address,a", po::value(&address_string)->default_value("0.0.0.0"))
-        ("port,p", po::value(&serverArguments.port)->default_value(443), "the port where the server is listening")
-        ("threads", po::value(&serverArguments.threads)->default_value(1))
-    ;
-
-    po::variables_map vm;
-    po::store(po::parse_command_line(argc, argv, desc), vm);
-    po::notify(vm);
-
-    if (vm.count("help")) {
-        std::cout << desc << "\n";
-        exit(1);
-    }
-
-    if (serverArguments.threads < 1) {
-        std::cerr << "threads must be at least 1." << std::endl;
-        exit(1);
-    }
-
-    serverArguments.address = boost::asio::ip::make_address(address_string);
-    return serverArguments;
-}
-
 int main(int argc, char** argv)
 {
-    const auto serverArguments = parseCommandLine(argc, argv);
+    const auto serverArguments = server::parseCommandLine(argc, argv);
     boost::asio::io_context ioc {serverArguments.threads};
     ssl::context ctx{ssl::context::sslv23};
     load_server_certificate(ctx);
