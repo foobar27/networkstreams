@@ -16,23 +16,21 @@
 #include <thread>
 #include <vector>
 
-
 namespace server {
 
 // Echoes back all received WebSocket messages
 class Session : public std::enable_shared_from_this<Session> {
-    boost::asio::ip::tcp::socket socket_;
-    boost::beast::websocket::stream<boost::asio::ssl::stream<boost::asio::ip::tcp::socket&>> ws_;
-    boost::asio::strand<
-        boost::asio::io_context::executor_type> strand_;
-    boost::beast::multi_buffer buffer_;
+    boost::asio::ip::tcp::socket m_socket;
+    boost::beast::websocket::stream<boost::asio::ssl::stream<boost::asio::ip::tcp::socket&>> m_ws;
+    boost::asio::strand<boost::asio::io_context::executor_type> m_strand;
+    boost::beast::multi_buffer m_buffer;
 
 public:
     // Take ownership of the socket
     Session(boost::asio::ip::tcp::socket socket, boost::asio::ssl::context& ctx)
-        : socket_(std::move(socket))
-        , ws_(socket_, ctx)
-        , strand_(ws_.get_executor())
+        : m_socket(std::move(socket))
+        , m_ws(m_socket, ctx)
+        , m_strand(m_ws.get_executor())
     {}
 
     // Start the asynchronous operation

@@ -22,9 +22,9 @@ namespace server {
 // Accepts incoming connections and launches the sessions
 class Listener : public std::enable_shared_from_this<Listener>
 {
-    boost::asio::ssl::context& ctx_;
-    boost::asio::ip::tcp::acceptor acceptor_;
-    boost::asio::ip::tcp::socket socket_;
+    boost::asio::ssl::context& m_ctx;
+    boost::asio::ip::tcp::acceptor m_acceptor;
+    boost::asio::ip::tcp::socket m_socket;
 
 public:
     Listener(

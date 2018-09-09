@@ -10,10 +10,10 @@ namespace server {
 // Start the asynchronous operation
 void Session::run() {
     // Perform the SSL handshake
-    ws_.next_layer().async_handshake(
+    m_ws.next_layer().async_handshake(
                 ssl::stream_base::server,
                 boost::asio::bind_executor(
-                    strand_,
+                    m_strand,
                     std::bind(
                         &Session::on_handshake,
                         shared_from_this(),
@@ -25,9 +25,9 @@ void Session::on_handshake(boost::system::error_code ec) {
         return fail(ec, "handshake");
 
     // Accept the websocket handshake
-    ws_.async_accept(
+    m_ws.async_accept(
                 boost::asio::bind_executor(
-                    strand_,
+                    m_strand,
                     std::bind(
                         &Session::on_accept,
                         shared_from_this(),
@@ -44,10 +44,10 @@ void Session::on_accept(boost::system::error_code ec) {
 
 void Session::do_read() {
     // Read a message into our buffer
-    ws_.async_read(
-                buffer_,
+    m_ws.async_read(
+                m_buffer,
                 boost::asio::bind_executor(
-                    strand_,
+                    m_strand,
                     std::bind(
                         &Session::on_read,
                         shared_from_this(),
@@ -68,11 +68,11 @@ void Session::on_read(
         fail(ec, "read");
 
     // Echo the message
-    ws_.text(ws_.got_text());
-    ws_.async_write(
-                buffer_.data(),
+    m_ws.text(m_ws.got_text());
+    m_ws.async_write(
+                m_buffer.data(),
                 boost::asio::bind_executor(
-                    strand_,
+                    m_strand,
                     std::bind(
                         &Session::on_write,
                         shared_from_this(),
@@ -89,7 +89,7 @@ void Session::on_write(
         return fail(ec, "write");
 
     // Clear the buffer
-    buffer_.consume(buffer_.size());
+    m_buffer.consume(m_buffer.size());
 
     // Do another read
     do_read();

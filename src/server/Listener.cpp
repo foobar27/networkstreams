@@ -11,13 +11,13 @@ Listener::Listener(
         boost::asio::io_context& ioc,
         ssl::context& ctx,
         tcp::endpoint endpoint)
-    : ctx_(ctx)
-    , acceptor_(ioc)
-    , socket_(ioc) {
+    : m_ctx(ctx)
+    , m_acceptor(ioc)
+    , m_socket(ioc) {
     boost::system::error_code ec;
 
     // Open the acceptor
-    acceptor_.open(endpoint.protocol(), ec);
+    m_acceptor.open(endpoint.protocol(), ec);
     if(ec)
     {
         fail(ec, "open");
@@ -25,21 +25,21 @@ Listener::Listener(
     }
 
     // Allow address reuse
-    acceptor_.set_option(boost::asio::socket_base::reuse_address(true), ec);
+    m_acceptor.set_option(boost::asio::socket_base::reuse_address(true), ec);
     if(ec) {
         fail(ec, "set_option");
         return;
     }
 
     // Bind to the server address
-    acceptor_.bind(endpoint, ec);
+    m_acceptor.bind(endpoint, ec);
     if(ec) {
         fail(ec, "bind");
         return;
     }
 
     // Start listening for connections
-    acceptor_.listen(
+    m_acceptor.listen(
                 boost::asio::socket_base::max_listen_connections, ec);
     if(ec) {
         fail(ec, "listen");
@@ -48,31 +48,28 @@ Listener::Listener(
 }
 
 // Start accepting incoming connections
-void
-Listener::run() {
-    if (!acceptor_.is_open())
+void Listener::run() {
+    if (!m_acceptor.is_open())
         return;
     do_accept();
 }
 
-void
-Listener::do_accept() {
-    acceptor_.async_accept(
-                socket_,
+void Listener::do_accept() {
+    m_acceptor.async_accept(
+                m_socket,
                 std::bind(
                     &Listener::on_accept,
                     shared_from_this(),
                     std::placeholders::_1));
 }
 
-void
-Listener::on_accept(boost::system::error_code ec) {
+void Listener::on_accept(boost::system::error_code ec) {
     if(ec) {
         fail(ec, "accept");
         exit(-1);
     } else {
         // Create the session and run it
-        std::make_shared<Session>(std::move(socket_), ctx_)->run();
+        std::make_shared<Session>(std::move(m_socket), m_ctx)->run();
     }
 
     // Accept another connection
