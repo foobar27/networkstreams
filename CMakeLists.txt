@@ -6,5 +6,4 @@ project(NetworkStream VERSION 0.1
 
 enable_testing()
 
-add_subdirectory(src/client)
-add_subdirectory(src/server)
+add_subdirectory(src/main)
