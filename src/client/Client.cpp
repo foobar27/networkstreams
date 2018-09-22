@@ -25,7 +25,7 @@ void run(const Arguments & args, const std::string & text) {
     boost::asio::io_context ioc;
 
     ssl::context ctx{ssl::context::sslv23_client};
-    load_root_certificates(ctx);
+    loadRootCertificates(ctx);
 
     tcp::resolver resolver{ioc};
     websocket::stream<ssl::stream<tcp::socket>> ws{ioc, ctx};
