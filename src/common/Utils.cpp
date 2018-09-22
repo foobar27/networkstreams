@@ -8,10 +8,13 @@ void fail(boost::system::error_code ec, char const* what) {
     std::cerr << what << ": " << ec.message() << "\n";
 }
 
-std::string readFile(const std::string &name) {
-    std::ifstream input(name);
-    std::stringstream sstr;
+std::string readFile(const std::filesystem::path & path) {
+    using namespace std;
+    using namespace filesystem;
+    std::ifstream f{ path };
 
-    while(input >> sstr.rdbuf());
-    return sstr.str();
+    const auto sz = file_size(path);
+    std::string result(sz, '\0');
+    f.read(result.data(), sz);
+    return result;
 }

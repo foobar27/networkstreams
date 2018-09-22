@@ -3,13 +3,12 @@
 
 #include <boost/log/trivial.hpp>
 
-void loadServerCertificate(boost::asio::ssl::context& ctx) {
-    BOOST_LOG_TRIVIAL(info) << "Loading server certificate";
-    std::string const cert = readFile("share/server/cert.pem");
-    BOOST_LOG_TRIVIAL(info) << "Loading server key";
-    std::string const key = readFile("share/server/key.pem");
-    BOOST_LOG_TRIVIAL(info) << "Loading dh parameters";
-    std::string const dh = readFile("share/server/dh.pem");
+namespace server {
+
+void loadServerCertificates(boost::asio::ssl::context& ctx, const SSLArguments & args) {
+    const auto & cert = args.sslCertificate;
+    const auto & key = args.sslKey;
+    const auto & dh = args.sslDh;
 
     ctx.set_password_callback(
         [](std::size_t,
@@ -32,4 +31,6 @@ void loadServerCertificate(boost::asio::ssl::context& ctx) {
 
     ctx.use_tmp_dh(
         boost::asio::buffer(dh.data(), dh.size()));
+}
+
 }

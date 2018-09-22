@@ -21,6 +21,12 @@ add_executable(server
     ServerCertificate.cpp
      ../common/Utils.h
      ../common/Utils.cpp)
-target_compile_features(server PUBLIC cxx_std_11)
+target_compile_features(server PUBLIC cxx_std_17)
 target_compile_definitions(server PUBLIC BOOST_LOG_DYN_LINK)
-target_link_libraries(server PUBLIC Boost::program_options Boost::system Boost::thread Boost::log OpenSSL::SSL OpenSSL::Crypto)
+target_link_libraries(server PUBLIC
+    Boost::program_options
+    Boost::system Boost::thread
+    Boost::log
+    OpenSSL::SSL
+    OpenSSL::Crypto
+    stdc++fs)

@@ -28,7 +28,7 @@ namespace server {
 void run(const Arguments & args) {
     boost::asio::io_context ioc {args.threads};
     ssl::context ctx{ssl::context::sslv23};
-    loadServerCertificate(ctx);
+    loadServerCertificates(ctx, args.ssl);
 
     std::make_shared<Listener>(ioc, ctx, tcp::endpoint{args.address, args.port})->run();
 

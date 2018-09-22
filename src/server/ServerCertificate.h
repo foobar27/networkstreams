@@ -1,9 +1,14 @@
 #pragma once
 
-#include <boost/asio/buffer.hpp>
 #include <boost/asio/ssl/context.hpp>
+
+#include "Arguments.h"
+
 #include <cstddef>
 #include <memory>
 
-void loadServerCertificate(boost::asio::ssl::context& ctx);
+namespace server {
 
+void loadServerCertificates(boost::asio::ssl::context& ctx, const SSLArguments & args);
+
+}
