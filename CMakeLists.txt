@@ -6,4 +6,6 @@ project(NetworkStream VERSION 0.1
 
 enable_testing()
 
+add_subdirectory(vendor/Catch2)
 add_subdirectory(src/main)
+add_subdirectory(src/test)
