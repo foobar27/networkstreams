@@ -4,6 +4,6 @@
 
 namespace networkstream { namespace client {
 
-void run(const Arguments &, const std::string & text);
+std::string run(const Arguments &, const std::string & text);
 
 }}

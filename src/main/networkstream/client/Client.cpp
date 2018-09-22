@@ -17,7 +17,7 @@ namespace websocket = boost::beast::websocket;
 
 namespace networkstream { namespace client {
 
-void run(const Arguments & args, const std::string & text) {
+std::string run(const Arguments & args, const std::string & text) {
     if (!args.quiet) {
         std::cout << "connecting to endpoint " << args.endpoint << std::endl;
     }
@@ -50,8 +50,7 @@ void run(const Arguments & args, const std::string & text) {
 
     // If we get here then the connection is closed gracefully
 
-    // The buffers() function helps print a ConstBufferSequence
-    std::cout << boost::beast::buffers(b.data()) << std::endl;
+    return boost::beast::buffers_to_string(b.data());
 }
 
 }}
