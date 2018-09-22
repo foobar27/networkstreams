@@ -6,6 +6,14 @@ find_package(Boost 1.67 REQUIRED COMPONENTS filesystem thread program_options lo
 
 find_package(OpenSSL REQUIRED)
 
+add_library(common STATIC
+    networkstream/server/ServerCertificate.h
+    networkstream/server/ServerCertificate.cpp
+    networkstream/common/Utils.h
+    networkstream/common/Utils.cpp)
+
+target_compile_features(common PUBLIC cxx_std_17)
+
 add_executable(client
     networkstream/client/Main.cpp
     networkstream/client/Client.cpp
@@ -13,11 +21,10 @@ add_executable(client
     networkstream/client/Arguments.cpp
     networkstream/client/Arguments.h
     networkstream/common/RootCertificates.cpp
-    networkstream/common/RootCertificates.h
-    networkstream/common/Utils.h
-    networkstream/common/Utils.cpp)
+    networkstream/common/RootCertificates.h)
 target_compile_features(client PUBLIC cxx_std_17)
 target_link_libraries(client PUBLIC
+    common
     Boost::program_options
     Boost::system
     Boost::thread
@@ -36,13 +43,11 @@ add_executable(server
     networkstream/server/Session.h
     networkstream/server/Listener.cpp
     networkstream/server/Listener.h
-    networkstream/server/ServerCertificate.h
-    networkstream/server/ServerCertificate.cpp
-    networkstream/common/Utils.h
-    networkstream/common/Utils.cpp)
+)
 target_compile_features(server PUBLIC cxx_std_17)
 target_compile_definitions(server PUBLIC BOOST_LOG_DYN_LINK)
 target_link_libraries(server PUBLIC
+    common
     Boost::program_options
     Boost::system Boost::thread
     Boost::log
