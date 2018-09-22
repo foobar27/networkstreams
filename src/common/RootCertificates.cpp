@@ -1,16 +1,7 @@
 #include "RootCertificates.h"
 #include <string>
-#include <iostream>
-#include <sstream>
-#include <fstream>
 
-std::string readFile(const std::string &name) {
-    std::ifstream input(name);
-    std::stringstream sstr;
-
-    while(input >> sstr.rdbuf());
-    return sstr.str();
-}
+#include "../common/Utils.h"
 
 void loadRootCertificateImpl(ssl::context &ctx, const std::string &fileName, boost::system::error_code &ec) {
     std::string const cert = readFile(fileName);

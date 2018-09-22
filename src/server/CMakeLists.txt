@@ -8,8 +8,6 @@ find_package(OpenSSL REQUIRED)
 
 add_executable(server
     Main.cpp
-    Utils.cpp
-    Utils.h
     Server.cpp
     Server.h
     Arguments.cpp
@@ -18,6 +16,9 @@ add_executable(server
     Session.h
     Listener.cpp
     Listener.h
-    ServerCertificate.h)
+    ServerCertificate.h
+    ServerCertificate.cpp
+     ../common/Utils.h
+     ../common/Utils.cpp)
 target_compile_features(server PUBLIC cxx_std_11)
 target_link_libraries(server PUBLIC Boost::program_options Boost::system Boost::thread OpenSSL::SSL OpenSSL::Crypto)
