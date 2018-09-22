@@ -24,7 +24,8 @@ using tcp = boost::asio::ip::tcp;
 namespace ssl = boost::asio::ssl;
 namespace websocket = boost::beast::websocket;
 
-namespace server {
+namespace networkstream { namespace server {
+
 void run(const Arguments & args) {
     boost::asio::io_context ioc {args.threads};
     ssl::context ctx{ssl::context::sslv23};
@@ -43,5 +44,6 @@ void run(const Arguments & args) {
         });
     ioc.run();
 }
-}
+
+}}
 

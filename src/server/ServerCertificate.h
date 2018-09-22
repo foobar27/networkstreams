@@ -7,8 +7,8 @@
 #include <cstddef>
 #include <memory>
 
-namespace server {
+namespace networkstream { namespace server {
 
 void loadServerCertificates(boost::asio::ssl::context& ctx, const SSLArguments & args);
 
-}
+}}

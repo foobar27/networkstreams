@@ -3,6 +3,8 @@
 
 #include "../common/Utils.h"
 
+namespace networkstream {
+
 void loadRootCertificateImpl(ssl::context &ctx, const std::string &fileName, boost::system::error_code &ec) {
     std::string const cert = readFile(fileName);
     ctx.add_certificate_authority(
@@ -28,4 +30,6 @@ void loadRootCertificates(ssl::context& ctx) {
     if (ec) {
         throw boost::system::system_error{ec};
     }
+}
+
 }

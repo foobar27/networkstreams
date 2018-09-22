@@ -16,7 +16,7 @@
 #include <thread>
 #include <vector>
 
-namespace server {
+namespace networkstream { namespace server {
 
 // Echoes back all received WebSocket messages
 class Session : public std::enable_shared_from_this<Session> {
@@ -47,4 +47,4 @@ public:
     void on_write(boost::system::error_code ec, std::size_t bytes_transferred);
 };
 
-}
+}}

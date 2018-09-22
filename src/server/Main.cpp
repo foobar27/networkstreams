@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-using namespace server;
+using namespace networkstream::server;
 
 int main(int argc, char** argv) {
     try {

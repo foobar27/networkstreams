@@ -3,7 +3,7 @@
 #include <iostream>
 #include <vector>
 
-namespace client {
+namespace networkstream { namespace client {
 
 struct Endpoint {
     std::string host;
@@ -27,4 +27,4 @@ struct Arguments {
 
 Arguments parseCommandLine(int argc, char** argv);
 
-}
+}}

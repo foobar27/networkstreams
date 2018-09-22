@@ -5,7 +5,7 @@
 
 #include "boost/program_options.hpp"\
 
-namespace client {
+namespace networkstream { namespace client {
 
 namespace po = boost::program_options;
 
@@ -58,4 +58,4 @@ Arguments parseCommandLine(int argc, char** argv) {
     return {{endpoint}, quiet};
 }
 
-}
+}}

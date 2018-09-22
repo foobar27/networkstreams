@@ -2,8 +2,8 @@
 
 #include "Arguments.h"
 
-namespace server {
+namespace networkstream { namespace server {
 
 void run(const Arguments & arguments);
 
-}
+}}

@@ -13,7 +13,7 @@
 
 #include "../common/Utils.h"
 
-namespace server {
+namespace networkstream { namespace server {
 
 namespace fs = std::filesystem;
 
@@ -85,4 +85,4 @@ Arguments parseCommandLine(int argc, char** argv) {
     return serverArguments;
 }
 
-}
+}}

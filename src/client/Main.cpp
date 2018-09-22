@@ -1,6 +1,6 @@
 #include "Client.h"
 
-using namespace client;
+using namespace networkstream::client;
 
 int main(int argc, char** argv) {
     try {

@@ -5,7 +5,7 @@ using tcp = boost::asio::ip::tcp;
 namespace ssl = boost::asio::ssl;
 namespace websocket = boost::beast::websocket;
 
-namespace server {
+namespace networkstream {namespace server {
 // Accepts incoming connections and launches the sessions
 Listener::Listener(
         boost::asio::io_context& ioc,
@@ -76,4 +76,4 @@ void Listener::on_accept(boost::system::error_code ec) {
     do_accept();
 }
 
-}
+}}

@@ -5,7 +5,7 @@ using tcp = boost::asio::ip::tcp;
 namespace ssl = boost::asio::ssl;
 namespace websocket = boost::beast::websocket;
 
-namespace server {
+namespace networkstream { namespace server {
 
 // Start the asynchronous operation
 void Session::run() {
@@ -94,5 +94,6 @@ void Session::on_write(
     // Do another read
     do_read();
 }
-};
+
+}}
 

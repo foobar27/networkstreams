@@ -2,7 +2,7 @@
 
 #include <boost/asio/ip/tcp.hpp>
 
-namespace server {
+namespace networkstream { namespace server {
 
 struct SSLArguments {
     std::string sslCertificate;
@@ -18,4 +18,5 @@ struct Arguments {
 };
 
 Arguments parseCommandLine(int argc, char** argv);
-}
+
+}}

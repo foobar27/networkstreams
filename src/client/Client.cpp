@@ -15,7 +15,7 @@ using tcp = boost::asio::ip::tcp;
 namespace ssl = boost::asio::ssl;
 namespace websocket = boost::beast::websocket;
 
-namespace client {
+namespace networkstream { namespace client {
 
 void run(const Arguments & args, const std::string & text) {
     if (!args.quiet) {
@@ -54,5 +54,5 @@ void run(const Arguments & args, const std::string & text) {
     std::cout << boost::beast::buffers(b.data()) << std::endl;
 }
 
-}
+}}
 

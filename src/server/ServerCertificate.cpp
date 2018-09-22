@@ -3,7 +3,7 @@
 
 #include <boost/log/trivial.hpp>
 
-namespace server {
+namespace networkstream { namespace server {
 
 void loadServerCertificates(boost::asio::ssl::context& ctx, const SSLArguments & args) {
     const auto & cert = args.sslCertificate;
@@ -33,4 +33,4 @@ void loadServerCertificates(boost::asio::ssl::context& ctx, const SSLArguments &
         boost::asio::buffer(dh.data(), dh.size()));
 }
 
-}
+}}
