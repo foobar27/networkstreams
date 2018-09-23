@@ -1,3 +1,4 @@
+#include "Server.h"
 #include "ServerCertificate.h"
 
 #include <boost/beast/core.hpp>
@@ -14,7 +15,8 @@
 #include <memory>
 #include <string>
 #include <thread>
-#include <vector>
+#include <future>
+#include <chrono>
 
 #include "Arguments.h"
 #include "Session.h"
@@ -26,23 +28,45 @@ namespace websocket = boost::beast::websocket;
 
 namespace networkstream { namespace server {
 
-void run(const Arguments & args) {
-    boost::asio::io_context ioc {args.threads};
-    ssl::context ctx{ssl::context::sslv23};
-    loadServerCertificates(ctx, args.ssl);
+Server::Server(const Arguments & args)
+    : m_ioc {args.threads}
+    , m_args(args)
+{
+    m_threads.reserve(m_args.threads);
+}
 
-    std::make_shared<Listener>(ioc, ctx, tcp::endpoint{args.address, args.port})->run();
+Server::~Server() {
+    m_ioc.stop();
+}
 
-    // Run the I/O service on the requested number of threads
-    std::vector<std::thread> v;
-    v.reserve(args.threads - 1);
-    for(auto i = args.threads - 1; i > 0; --i)
-        v.emplace_back(
-        [&ioc]
+void Server::start() {
+    loadServerCertificates(m_ctx, m_args.ssl);
+    std::make_shared<Listener>(m_ioc, m_ctx, tcp::endpoint{m_args.address, m_args.port})->run();
+
+    for(auto i = m_args.threads; i > 0; --i) {
+        m_threads.emplace_back([this]
         {
-            ioc.run();
+            this->m_ioc.run();
         });
-    ioc.run();
+        m_threads.back().detach();
+    }
+}
+
+void Server::awaitTerminated() {
+    while (!m_ioc.stopped()) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+}
+
+void Server::stop() {
+    m_ioc.stop();
+    awaitTerminated();
+}
+
+void run(const Arguments & args) {
+    Server server {args};
+    server.start();
+    server.stop();
 }
 
 }}

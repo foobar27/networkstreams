@@ -43,7 +43,6 @@ Arguments parseCommandLine(int argc, char** argv) {
     desc.add_options()
         ("help", "produce help message")
         ("endpoint", po::value(&endpoint)->required(), "the endpoint, e.g. localhost:443/path (default port: 443, default path: /)")
-        ("quiet,q", "Disable logging")
     ;
 
     po::variables_map vm;
@@ -54,8 +53,7 @@ Arguments parseCommandLine(int argc, char** argv) {
         std::cout << desc << "\n";
         exit(1);
     }
-    bool quiet = vm.count("quiet") > 0;
-    return {{endpoint}, quiet};
+    return {{endpoint}};
 }
 
 }}

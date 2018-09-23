@@ -1,3 +1,4 @@
+#include "Client.h"
 #include "../common/RootCertificates.h"
 
 #include <boost/beast/core.hpp>
@@ -6,10 +7,13 @@
 #include <boost/asio/connect.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/ssl/stream.hpp>
+#include <boost/log/trivial.hpp>
 #include <cstdlib>
 #include <iostream>
 
 #include "Arguments.h"
+
+#include <boost/log/trivial.hpp>
 
 using tcp = boost::asio::ip::tcp;
 namespace ssl = boost::asio::ssl;
@@ -17,27 +21,26 @@ namespace websocket = boost::beast::websocket;
 
 namespace networkstream { namespace client {
 
-std::string run(const Arguments & args, const std::string & text) {
-    if (!args.quiet) {
-        std::cout << "connecting to endpoint " << args.endpoint << std::endl;
-    }
+void Client::addRootCertificate(const std::string & cert) {
+    ::networkstream::addRootCertificate(m_ctx, cert);
+}
+
+std::string Client::execute(const std::string & request) {
+    BOOST_LOG_TRIVIAL(info) << "Connecting to endpoint " << m_args.endpoint;
 
     boost::asio::io_context ioc;
 
-    ssl::context ctx{ssl::context::sslv23_client};
-    loadRootCertificates(ctx);
-
     tcp::resolver resolver{ioc};
-    websocket::stream<ssl::stream<tcp::socket>> ws{ioc, ctx};
+    websocket::stream<ssl::stream<tcp::socket>> ws{ioc, m_ctx};
 
-    auto const results = resolver.resolve(args.endpoint.host, args.endpoint.port);
+    auto const results = resolver.resolve(m_args.endpoint.host, m_args.endpoint.port);
     // TODO error handling
     boost::asio::connect(ws.next_layer().next_layer(), results.begin(), results.end());
     ws.next_layer().handshake(ssl::stream_base::client);
-    ws.handshake(args.endpoint.host, args.endpoint.path);
+    ws.handshake(m_args.endpoint.host, m_args.endpoint.path);
 
     // Send the message
-    ws.write(boost::asio::buffer(std::string(text)));
+    ws.write(boost::asio::buffer(std::string(request)));
 
     // This buffer will hold the incoming message
     boost::beast::multi_buffer b;
